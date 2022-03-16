@@ -7,6 +7,6 @@
         "emitDecoratorMetadata": true, /* Enables experimental support for ES7 decorators. */
         "experimentalDecorators": true, /* Enables experimental support for emitting type metadata for decorators. */
         "removeComments": false, /* Do not emit comments to output. */
-        "noImplicitAny": true // 암시적으로 선언되었는데 any로 추론되면 에러를 알려준다.
+        "noImplicitAny": false // 암시적으로 선언되었는데 any로 추론되면 에러를 알려준다.
     },
 }

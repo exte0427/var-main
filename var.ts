@@ -276,6 +276,30 @@ namespace VarInternal {
         }
     }
 
+    export namespace varManage {
+        export const compile = (vars: any): any => {
+            let newVars: any;
+            for (const elementName in vars) {
+                let newElement;
+                const element = { name: elementName, value: vars[elementName] };
+                if (!Array.isArray(element.value))
+                    element.value = [element.value];
+
+                newElement.name = element.name;
+                newElement.value = Var.make(`variable`, [], ...element.value.map(v => {
+                    if (v instanceof parser.virtualDom)
+                        return v;
+                    else
+                        return Var.text(v);
+                }));
+
+                newVars[newElement.name] = newElement.value;
+            }
+
+            return newVars;
+        }
+    }
+
     export namespace detecter {
 
         export const getState = (target: parser.virtualDom) => {
@@ -302,7 +326,7 @@ namespace VarInternal {
             if (myVar.update !== null)
                 myVar.variable = myVar.update(myVar.variable, myVar.state);
 
-            let childList = myVar.render(myVar.variable, myVar.state).childList;
+            let childList: Array<any> = myVar.render(varManage.compile(myVar.variable), varManage.compile(myVar.state)).childList;
             childList = childList.map(element => subVar(element));
 
             return new parser.virtualDom(target.tagName, target.attributesList, childList, target.value, target.key, myVar);

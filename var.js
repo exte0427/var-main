@@ -9,6 +9,15 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 var Var;
 (function (Var) {
     Var.make = function (tagName, states) {
@@ -249,6 +258,27 @@ var VarInternal;
             });
         };
     })(changer = VarInternal.changer || (VarInternal.changer = {}));
+    var varManage;
+    (function (varManage) {
+        varManage.compile = function (vars) {
+            var newVars;
+            for (var elementName in vars) {
+                var newElement = void 0;
+                var element = { name: elementName, value: vars[elementName] };
+                if (!Array.isArray(element.value))
+                    element.value = [element.value];
+                newElement.name = element.name;
+                newElement.value = Var.make.apply(Var, __spreadArray(["variable", []], element.value.map(function (v) {
+                    if (v instanceof parser.virtualDom)
+                        return v;
+                    else
+                        return Var.text(v);
+                }), false));
+                newVars[newElement.name] = newElement.value;
+            }
+            return newVars;
+        };
+    })(varManage = VarInternal.varManage || (VarInternal.varManage = {}));
     var detecter;
     (function (detecter) {
         detecter.getState = function (target) {
@@ -273,7 +303,7 @@ var VarInternal;
                 myVar.variable = myVar.start(myVar.variable, detecter.getState(target));
             if (myVar.update !== null)
                 myVar.variable = myVar.update(myVar.variable, myVar.state);
-            var childList = myVar.render(myVar.variable, myVar.state).childList;
+            var childList = myVar.render(varManage.compile(myVar.variable), varManage.compile(myVar.state)).childList;
             childList = childList.map(function (element) { return detecter.subVar(element); });
             return new parser.virtualDom(target.tagName, target.attributesList, childList, target.value, target.key, myVar);
         };
