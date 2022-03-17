@@ -12,6 +12,10 @@ namespace Var {
         return new VarInternal.parser.virtualState(stateName, stateVal);
     }
 
+    export const change = (value: any): VarInternal.parser.virtualDom => {
+        return VarInternal.varManage.compile([value])[0];
+    }
+
     export class varForm {
         name: string;
         state: any;
@@ -278,9 +282,9 @@ namespace VarInternal {
 
     export namespace varManage {
         export const compile = (vars: any): any => {
-            let newVars: any;
+            let newVars: any = {};
             for (const elementName in vars) {
-                let newElement;
+                let newElement = { name: "", value: Var.text("none") };
                 const element = { name: elementName, value: vars[elementName] };
                 if (!Array.isArray(element.value))
                     element.value = [element.value];
@@ -326,7 +330,7 @@ namespace VarInternal {
             if (myVar.update !== null)
                 myVar.variable = myVar.update(myVar.variable, myVar.state);
 
-            let childList: Array<any> = myVar.render(varManage.compile(myVar.variable), varManage.compile(myVar.state)).childList;
+            let childList: Array<any> = myVar.render(myVar.variable, myVar.state).childList;
             childList = childList.map(element => subVar(element));
 
             return new parser.virtualDom(target.tagName, target.attributesList, childList, target.value, target.key, myVar);

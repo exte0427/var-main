@@ -33,6 +33,9 @@ var Var;
     Var.state = function (stateName, stateVal) {
         return new VarInternal.parser.virtualState(stateName, stateVal);
     };
+    Var.change = function (value) {
+        return VarInternal.varManage.compile([value])[0];
+    };
     var varForm = /** @class */ (function () {
         function varForm(name_, start_, update_, render_, variable_, state_) {
             if (name_ === void 0) { name_ = ""; }
@@ -261,9 +264,9 @@ var VarInternal;
     var varManage;
     (function (varManage) {
         varManage.compile = function (vars) {
-            var newVars;
+            var newVars = {};
             for (var elementName in vars) {
-                var newElement = void 0;
+                var newElement = { name: "", value: Var.text("none") };
                 var element = { name: elementName, value: vars[elementName] };
                 if (!Array.isArray(element.value))
                     element.value = [element.value];
@@ -303,7 +306,7 @@ var VarInternal;
                 myVar.variable = myVar.start(myVar.variable, detecter.getState(target));
             if (myVar.update !== null)
                 myVar.variable = myVar.update(myVar.variable, myVar.state);
-            var childList = myVar.render(varManage.compile(myVar.variable), varManage.compile(myVar.state)).childList;
+            var childList = myVar.render(myVar.variable, myVar.state).childList;
             childList = childList.map(function (element) { return detecter.subVar(element); });
             return new parser.virtualDom(target.tagName, target.attributesList, childList, target.value, target.key, myVar);
         };
